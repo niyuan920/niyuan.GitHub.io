@@ -1,37 +1,63 @@
-## Welcome to GitHub Pages
+sqlHelper
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Reflection;
+using System.Text;
 
-You can use the [editor on GitHub](https://github.com/niyuan920/niyuan.GitHub.io/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+namespace IDEA.Repository.DAO
+{
+    public static class EFUtility
+    {
+        private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
+        {
+            var conn = facade.GetDbConnection();
+            connection = conn;
+            conn.Open();
+            var cmd = conn.CreateCommand();
+            if (facade.IsSqlServer())
+            {
+                cmd.CommandText = sql;
+                cmd.Parameters.AddRange(parameters);
+            }
+            return cmd;
+        }
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+        public static DataTable SqlQuery(this DatabaseFacade facade, string sql, params object[] parameters)
+        {
+            var command = CreateCommand(facade, sql, out DbConnection conn, parameters);
+            var reader = command.ExecuteReader();
+            var dt = new DataTable();
+            dt.Load(reader);
+            reader.Close();
+            conn.Close();
+            return dt;
+        }
 
-### Markdown
+        public static List<T> SqlQuery<T>(this DatabaseFacade facade, string sql, params object[] parameters) where T : class, new()
+        {
+            var dt = SqlQuery(facade, sql, parameters);
+            return dt.ToList<T>();
+        }
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/niyuan920/niyuan.GitHub.io/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+        public static List<T> ToList<T>(this DataTable dt) where T : class, new()
+        {
+            var propertyInfos = typeof(T).GetProperties();
+            var list = new List<T>();
+            foreach (DataRow row in dt.Rows)
+            {
+                var t = new T();
+                foreach (PropertyInfo p in propertyInfos)
+                {
+                    if (dt.Columns.IndexOf(p.Name) != -1 && row[p.Name] != DBNull.Value)
+                        p.SetValue(t, row[p.Name], null);
+                }
+                list.Add(t);
+            }
+            return list;
+        }
+    }
+}
