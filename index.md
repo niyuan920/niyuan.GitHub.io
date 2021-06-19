@@ -1,16 +1,5 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Reflection;
-using System.Text;
+手动访问数据库
 
-namespace IDEA.Repository.DAO
-{
-    public static class EFUtility
-    {
         private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
         {
             var conn = facade.GetDbConnection();
