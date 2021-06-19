@@ -1,4 +1,4 @@
-.NET CORE MVC手动访问数据库
+.NET CORE MVC中访问数据库
 
         private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
         {
@@ -48,4 +48,107 @@
             return list;
         }
     }
-}
+    
+三层架构中访问数据库
+
+    class MysqlHelper
+    {
+        static readonly string CONNSTR = "server=.;database=companysales;uid=yuan;pwd=88888888;";
+        public static int ExecuteMyDML(string sql, SqlParameter[] sqlParams)
+        {
+            SqlConnection conn = new SqlConnection(CONNSTR);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+
+                cmd.CommandText = sql;
+                if (null != sqlParams && sqlParams.Length > 0)
+                {
+                    cmd.Parameters.AddRange(sqlParams);
+                }
+                int res = cmd.ExecuteNonQuery();
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return -1;
+            }
+            finally
+            {
+                if (conn.State != System.Data.ConnectionState.Closed)
+                {
+                    conn.Close();
+                }
+            }
+        }
+        public static DataTable QueryData(string sql)
+        {
+            SqlConnection conn = new SqlConnection(CONNSTR);
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+
+                cmd.CommandText = sql;
+                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                adapter.Fill(dt);
+
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            finally
+            {
+                if (conn.State != System.Data.ConnectionState.Closed)
+                {
+                    conn.Close();
+                }
+            }
+        
+            }
+      public  static object ExecuteMyObject(string sql, SqlParameter[] sqlParams)
+        {
+            SqlConnection conn = new SqlConnection(CONNSTR);
+            try
+            {
+                conn.Open();
+
+                SqlCommand cmd = new SqlCommand();
+                cmd.Connection = conn;
+
+                cmd.CommandText = sql;
+
+                //cmd.Parameters.AddWithValue("@UID", uid);
+                //cmd.Parameters.AddWithValue("@PWD", pwd);
+                if (null != sqlParams && sqlParams.Length > 0)
+                {
+                    cmd.Parameters.AddRange(sqlParams);
+                }
+
+                object res = cmd.ExecuteScalar();
+                return res;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            finally
+            {
+                if (conn.State != System.Data.ConnectionState.Closed)
+                {
+                    conn.Close();
+                }
+            }
+        }
+    }
+
+
