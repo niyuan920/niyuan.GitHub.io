@@ -1,8 +1,18 @@
 .NET CORE MVC中访问数据库
+
 首先确保都安装CLI相关工具引用，在Package Manager console中运行以下命令：
 
-Install-Package Microsoft.EntityFrameworkCore.Design
-Install-Package Microsoft.EntityFrameworkCore.Tools
+    Install-Package Microsoft.EntityFrameworkCore.Design
+    Install-Package Microsoft.EntityFrameworkCore.Tools
+    
+需要使用 Scaffold-DbContext 命令生成数据实体类型，数据表必须有主键！
+
+    Scaffold-DbContext "Server=.;Database=IDEA;Trusted_Connection=True;uid=sa;pwd=1005" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context SaleContext -DataAnnotations -Force
+
+EF Core查询方法参考
+https://github.com/imwyw/.net/blob/master/CrossPlatform/EFCore.md
+
+手写sql查询函数
 
         private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
         {
