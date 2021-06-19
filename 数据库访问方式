@@ -1,4 +1,8 @@
 .NET CORE MVC中访问数据库
+首先确保都安装CLI相关工具引用，在Package Manager console中运行以下命令：
+
+Install-Package Microsoft.EntityFrameworkCore.Design
+Install-Package Microsoft.EntityFrameworkCore.Tools
 
         private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
         {
