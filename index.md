@@ -1,4 +1,4 @@
-手动访问数据库
+.NET CORE MVC手动访问数据库
 
         private static DbCommand CreateCommand(DatabaseFacade facade, string sql, out DbConnection connection, params object[] parameters)
         {
