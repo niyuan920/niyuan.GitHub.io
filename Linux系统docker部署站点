@@ -26,5 +26,7 @@ Linux系统docker部署站点步骤：
 二、项目部署：
 1、创建项目并创建Dockerfile文件，项目发布并将发布文件上传到linux系统
 2、在上传发布文件的目录下执行打包命令：docker build -t 镜像名:版本 .
-3、将docker-compose.yml文件上传到docker-compose安装目录，当前安装的目录地址为：/usr/local/bin/docker-compose (docker-compose.yml根据镜像包设置内容)
-4、启动项目：docker-compose up -d
+3、将docker-compose.yml文件上传到docker-compose安装目录，当前安装的目录地址为：
+  /usr/local/bin/docker-compose (docker-compose.yml根据镜像包设置内容)
+4、启动项目：
+  docker-compose up -d
